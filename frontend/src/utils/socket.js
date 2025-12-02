@@ -1,15 +1,19 @@
 // frontend/src/utils/socket.js
 import { io } from 'socket.io-client';
 
+// const socket = io('https://quizboom-backend.onrender.com', {
+//   autoConnect: true,
+//   reconnection: true,
+//   reconnectionAttempts: 5,
+//   reconnectionDelay: 1000,
+//   timeout: 20000,
+//   transports: ['websocket'],  // Force WebSocket (no polling on Render)
+//   upgrade: false,             // Prevent HTTP long-polling fallback
+//   path: '/socket.io'
+// });
 const socket = io('https://quizboom-backend.onrender.com', {
   autoConnect: true,
-  reconnection: true,
-  reconnectionAttempts: 5,
-  reconnectionDelay: 1000,
-  timeout: 20000,
-  transports: ['websocket'],  // Force WebSocket (no polling on Render)
-  upgrade: false,             // Prevent HTTP long-polling fallback
-  path: '/socket.io'
+  transports: ['websocket']
 });
 
 // Debug logs for troubleshooting
