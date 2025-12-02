@@ -25,8 +25,11 @@ const allowedOrigins = [
 //   credentials: true
 // }));
 app.use(cors({
-  origin: allowedOrigins,
-  credentials: true,
+  // origin: allowedOrigins,
+  // credentials: true,
+  origin: '*',
+  methods: ['GET', 'POST'],
+  credentials: true
 }));
 
 
@@ -52,8 +55,8 @@ const io = new Server(server, {
 // app.use(express.json());
 app.use(express.json());
 
+// app.use('/socket.io', express.static(__dirname + '/node_modules/socket.io-client/dist'));
 app.use('/socket.io', express.static(__dirname + '/node_modules/socket.io-client/dist'));
-
 // Your existing app.get('/', ...) continues here
 
 // Health check route (what you see when visiting backend URL)
@@ -92,10 +95,17 @@ io.on('connection', (socket) => {
   console.log('User connected:', socket.id);
 
   // HOST: Create game
-  socket.on('start-game', ({ quizId }) => {
-    if (!quizzes[quizId]) {
-      return socket.emit('error', 'Quiz not found');
-    }
+  // socket.on('start-game', ({ quizId }) => {
+  //   if (!quizzes[quizId]) {
+  //     return socket.emit('error', 'Quiz not found');
+  //   }
+  // In io.on('connection'), add logging to start-game
+socket.on('start-game', ({ quizId }) => {
+  console.log('📨 Received start-game from frontend with quizId:', quizId);
+  // ... rest of your existing code
+  socket.emit('game-created', { gamePIN });
+  console.log('📤 Sent game-created back with PIN:', gamePIN);
+});
 
     const gamePIN = Math.floor(100000 + Math.random() * 900000).toString();
     games[gamePIN] = {
