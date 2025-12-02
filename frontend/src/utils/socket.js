@@ -11,8 +11,8 @@ socket.on('connect', () => {
   console.log('Connected to QuizBoom backend!');
 });
 
-socket.on('connect_error', () => {
-  console.log('WebSocket connection error:', error);
+socket.on('connect_error', (err) => {
+  console.log('WebSocket connection error:', err.message);
 });
 
 export default socket;
