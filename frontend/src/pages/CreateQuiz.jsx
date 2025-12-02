@@ -37,30 +37,54 @@ function CreateQuiz() {
     setQuestions(updated);
   };
 
+  // const saveQuiz = async () => {
+  //   if (!questions.every(q => q.questionText && q.options.every(o => o))) {
+  //     alert('Please fill all questions and options!');
+  //     return;
+  //   }
+
+  //   try {
+  //       const res = await axios.post('https://quizboom-backend.onrender.com/api/create-quiz', {
+  //       title,
+  //       questions: questions.map(q => ({
+  //         question: q.questionText,
+  //         answers: q.options,
+  //         correctAnswer: q.correctIndex,
+  //         time: q.timeLimit,
+  //       })),
+  //     });
+
+  //     const quizId = res.data.quizId;
+  //     navigate(`/host?quizId=${quizId}`);
+  //   } catch (err) {
+  //     alert('Error saving quiz: ' + err.message);
+  //   }
+  // };
+
   const saveQuiz = async () => {
-    if (!questions.every(q => q.questionText && q.options.every(o => o))) {
-      alert('Please fill all questions and options!');
-      return;
-    }
+  if (!questions.every(q => q.questionText && q.options.every(o => o))) {
+    alert('Please fill all questions and options!');
+    return;
+  }
 
-    try {
-        const res = await axios.post('https://quizboom-backend.onrender.com/api/create-quiz', {
-        title,
-        questions: questions.map(q => ({
-          question: q.questionText,
-          answers: q.options,
-          correctAnswer: q.correctIndex,
-          time: q.timeLimit,
-        })),
-      });
+  try {
+    const res = await axios.post('https://quizboom-backend.onrender.com/api/create-quiz', {
+      title,
+      questions: questions.map(q => ({
+        question: q.questionText,
+        answers: q.options,
+        correctAnswer: q.correctIndex,
+        time: q.timeLimit,
+      })),
+    });
 
-      const quizId = res.data.quizId;
-      navigate(`/host?quizId=${quizId}`);
-    } catch (err) {
-      alert('Error saving quiz: ' + err.message);
-    }
-  };
-
+    const quizId = res.data.quizId;
+    navigate(`/host?quizId=${quizId}`);
+  } catch (err) {
+    console.error('Save error:', err);  // Add this for debugging
+    alert('Error saving quiz: ' + err.message);
+  }
+};
   return (
     <div className="min-h-screen bg-gray-900 text-white p-6">
       <div className="max-w-4xl mx-auto">
