@@ -35,7 +35,12 @@ const io = new Server(server, {
   transports: ['websocket']  // ← Forces secure WebSocket (critical for Render!)
 });
 
+// app.use(express.json());
 app.use(express.json());
+
+app.use('/socket.io', express.static(__dirname + '/node_modules/socket.io-client/dist'));
+
+// Your existing app.get('/', ...) continues here
 
 // Health check route (what you see when visiting backend URL)
 app.get('/', (req, res) => {
