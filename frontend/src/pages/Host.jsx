@@ -20,12 +20,25 @@ export default function Host() {
   useEffect(() => {
     if (!quizId) return;
 
+    // socket.emit('start-game', { quizId });
+
+    // socket.on('game-created', ({ gamePIN }) => setGamePIN(gamePIN));
+    // socket.on('player-joined', ({ nickname }) => {
+    //   setPlayers(prev => [...prev, { nickname, score: 0 }]);
+    // });
+
+    console.log('🔄 Emitting start-game with quizId:', quizId);
     socket.emit('start-game', { quizId });
 
-    socket.on('game-created', ({ gamePIN }) => setGamePIN(gamePIN));
-    socket.on('player-joined', ({ nickname }) => {
-      setPlayers(prev => [...prev, { nickname, score: 0 }]);
+    socket.on('game-created', ({ gamePIN }) => {
+      console.log('🎯 PIN received:', gamePIN);
+      setGamePIN(gamePIN);
     });
+
+  socket.on('error', (msg) => {
+    console.log('🚨 Game creation error:', msg);
+    setGamePIN('Error: ' + msg);
+  });
 
     socket.on('question-start', (data) => {
       setCurrentQuestion(data); 
