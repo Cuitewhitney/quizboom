@@ -14,26 +14,40 @@ const allowedOrigins = [
   'http://localhost:5173'           // ← Local dev
 ];
 
+// app.use(cors({
+//   origin: (origin, callback) => {
+//     if (!origin || allowedOrigins.includes(origin)) {
+//       callback(null, true);
+//     } else {
+//       callback(new Error('Not allowed by CORS'));
+//     }
+//   },
+//   credentials: true
+// }));
 app.use(cors({
-  origin: (origin, callback) => {
-    if (!origin || allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      callback(new Error('Not allowed by CORS'));
-    }
-  },
-  credentials: true
+  origin: allowedOrigins,
+  credentials: true,
 }));
 
+
 // Socket.IO CORS (same rules)
+// const io = new Server(server, {
+//   cors: {
+//     origin: allowedOrigins,
+//     methods: ['GET', 'POST'],
+//     credentials: true
+//   },
+//   transports: ['websocket']  // ← Forces secure WebSocket (critical for Render!)
+// });
 const io = new Server(server, {
   cors: {
     origin: allowedOrigins,
     methods: ['GET', 'POST'],
     credentials: true
   },
-  transports: ['websocket']  // ← Forces secure WebSocket (critical for Render!)
+  transports: ['websocket']
 });
+
 
 // app.use(express.json());
 app.use(express.json());
