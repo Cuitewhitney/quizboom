@@ -1,3 +1,4 @@
+// backend/server.js
 const express = require('express');
 const http = require('http');
 const { Server } = require('socket.io');
@@ -6,32 +7,56 @@ const { v4: uuidv4 } = require('uuid');
 
 const app = express();
 const server = http.createServer(app);
-const io = new Server(server, {
-  cors: {
-    origin: '*',
-    methods: ['GET', 'POST']
-  }
-});
+
+// CORS: Allow your live frontend (and localhost during dev)
+const allowedOrigins = [
+  'https://quizboom.onrender.com',  // ← Your live frontend
+  'http://localhost:5173'           // ← Local dev
+];
 
 app.use(cors({
-  origin: '*'
+  origin: (origin, callback) => {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true
 }));
-app.use(express.json());
 
-app.get('/', (req, res) => {
-  res.json({ message: 'QuizBoom Backend is LIVE! 🚀 Create quizzes at /api/create-quiz' });
+// Socket.IO CORS (same rules)
+const io = new Server(server, {
+  cors: {
+    origin: allowedOrigins,
+    methods: ['GET', 'POST'],
+    credentials: true
+  },
+  transports: ['websocket']  // ← Forces secure WebSocket (critical for Render!)
 });
 
+app.use(express.json());
+
+// Health check route (what you see when visiting backend URL)
+app.get('/', (req, res) => {
+  res.json({ 
+    message: 'QuizBoom Backend is LIVE! Create quizzes at /api/create-quiz',
+    status: 'healthy',
+    playersOnline: Object.keys(io.sockets.sockets).length
+  });
+});
+
+// Force HTTPS on Render
 app.use((req, res, next) => {
-  if (req.header('x-forwarded-proto') !== 'https' && process.env.NODE_ENV === 'production') {
+  if (process.env.RENDER && req.header('x-forwarded-proto') !== 'https') {
     return res.redirect(301, `https://${req.header('host')}${req.url}`);
   }
   next();
 });
 
 // In-memory storage
-const quizzes = {}; // { quizId: { title, questions: [{ question, answers, correctAnswer, time }] } }
-const games = {};   // { gamePIN: { hostSocket, players: { socketId: { nickname, score, hasAnswered } }, quiz, currentQuestion, status, timeLeft } }
+const quizzes = {};
+const games = {};
 
 // API: Create quiz
 app.post('/api/create-quiz', (req, res) => {
@@ -40,6 +65,7 @@ app.post('/api/create-quiz', (req, res) => {
     title: req.body.title || 'Untitled Quiz',
     questions: req.body.questions || []
   };
+  console.log(`Quiz created: ${quizId} - ${quizzes[quizId].title}`);
   res.json({ quizId });
 });
 
@@ -63,7 +89,7 @@ io.on('connection', (socket) => {
     };
 
     socket.join(gamePIN);
-    console.log(`Game created! PIN: ${gamePIN}`);
+    console.log(`Game created! PIN: ${gamePIN} | Host: ${socket.id}`);
     socket.emit('game-created', { gamePIN });
   });
 
@@ -83,9 +109,9 @@ io.on('connection', (socket) => {
     socket.join(gamePIN);
     socket.emit('join-success');
 
-    // Notify everyone in the room
+    // Notify everyone
     io.to(gamePIN).emit('player-joined', { nickname });
-    io.to(game.hostSocket).emit('player-joined', { nickname });
+    console.log(`${nickname} joined game ${gamePIN}`);
   });
 
   // HOST: Start the game
@@ -94,7 +120,7 @@ io.on('connection', (socket) => {
     if (!game || game.hostSocket !== socket.id || game.status !== 'lobby') return;
 
     game.status = 'playing';
-    game.currentQuestion = 0;
+    console.log(`Game ${pin} started by host`);
     startNextQuestion(pin);
   });
 
@@ -108,7 +134,7 @@ io.on('connection', (socket) => {
 
     const question = game.quiz.questions[game.currentQuestion];
     if (question.correctAnswer === answerIndex) {
-      const points = Math.ceil((game.timeLeft || 5) * 50); // Max 1000 points
+      const points = Math.ceil((game.timeLeft || 5) * 50);
       player.score += points;
     }
   });
@@ -116,14 +142,12 @@ io.on('connection', (socket) => {
   function startNextQuestion(pin) {
     const game = games[pin];
     if (!game || game.currentQuestion >= game.quiz.questions.length) {
-      endGame(pin);
-      return;
+      return endGame(pin);
     }
 
     const q = game.quiz.questions[game.currentQuestion];
     game.timeLeft = q.time || 20;
 
-    // Reset answers
     Object.values(game.players).forEach(p => p.hasAnswered = false);
 
     io.to(pin).emit('question-start', {
@@ -152,7 +176,6 @@ io.on('connection', (socket) => {
       .sort((a, b) => b.score - a.score);
 
     io.to(pin).emit('leaderboard', board);
-
     game.currentQuestion++;
     setTimeout(() => startNextQuestion(pin), 7000);
   }
@@ -166,16 +189,15 @@ io.on('connection', (socket) => {
       .sort((a, b) => b.score - a.score);
 
     io.to(pin).emit('game-end', results);
-    console.log(`Game ${pin} ended. Winner: ${results[0]?.nickname || 'No one'}`);
+    console.log(`Game ${pin} ended. Winner: ${results[0]?.nickname || 'None'}`);
     delete games[pin];
   }
 
   socket.on('disconnect', () => {
     console.log('User disconnected:', socket.id);
-    // Remove player from any game
     Object.keys(games).forEach(pin => {
       const game = games[pin];
-      if (game.players[socket.id]) {
+      if (game && game.players[socket.id]) {
         delete game.players[socket.id];
         io.to(pin).emit('player-left', { playerId: socket.id });
       }
@@ -183,7 +205,8 @@ io.on('connection', (socket) => {
   });
 });
 
-const PORT = 3000;
+// Use Render's port or 3000
+const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => {
-  console.log(`QuizBoom server running on http://localhost:${PORT}`);
+  console.log(`QuizBoom server running on port ${PORT}`);
 });
