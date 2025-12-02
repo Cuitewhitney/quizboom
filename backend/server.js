@@ -16,6 +16,10 @@ const io = new Server(server, {
 app.use(cors());
 app.use(express.json());
 
+app.get('/', (req, res) => {
+  res.json({ message: 'QuizBoom Backend is LIVE! 🚀 Create quizzes at /api/create-quiz' });
+});
+
 // In-memory storage
 const quizzes = {}; // { quizId: { title, questions: [{ question, answers, correctAnswer, time }] } }
 const games = {};   // { gamePIN: { hostSocket, players: { socketId: { nickname, score, hasAnswered } }, quiz, currentQuestion, status, timeLeft } }
