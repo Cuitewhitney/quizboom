@@ -44,7 +44,7 @@ function CreateQuiz() {
     }
 
     try {
-      const res = await axios.post('http://localhost:3000/api/create-quiz', {
+        const res = await axios.post('https://quizboom-backend.onrender.com/api/create-quiz', {
         title,
         questions: questions.map(q => ({
           question: q.questionText,
