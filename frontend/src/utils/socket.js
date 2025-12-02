@@ -1,11 +1,10 @@
 // frontend/src/utils/socket.js
 import { io } from 'socket.io-client';
 
-const socket = io('https://quizboom.onrender.com', {
+const socket = io('https://quizboom-backend.onrender.com', {
   transports: ['websocket'],
-  reconnection: true,
-  reconnectionAttempts: 10,
 });
+
 
 
 socket.on('connect', () => {
