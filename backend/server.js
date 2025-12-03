@@ -257,10 +257,19 @@ const allowedOrigins = [
   'http://localhost:5173'          // Local dev
 ];
 
-// CORS for Express
+// // CORS for Express
+// app.use(cors({
+//   origin: allowedOrigins,
+//   methods: ['GET', 'POST'],
+//   credentials: true
+// }));
 app.use(cors({
-  origin: allowedOrigins,
-  methods: ['GET', 'POST'],
+  origin: [
+    'https://quizboom-frontend.vercel.app',  // ← Your Vercel frontend
+    'https://quizboom.onrender.com',         // ← Old Render frontend (backup)
+    'http://localhost:5173'                  // ← Local dev
+  ],
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
   credentials: true
 }));
 
@@ -269,7 +278,11 @@ app.use(express.json());
 // Socket.IO with CORS
 const io = new Server(server, {
   cors: {
-    origin: allowedOrigins,
+    origin: [
+      'https://quizboom-frontend.vercel.app',
+      'https://quizboom.onrender.com',
+      'http://localhost:5173'
+      ],
     methods: ['GET', 'POST'],
     credentials: true
   },
