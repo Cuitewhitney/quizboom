@@ -91,11 +91,11 @@ export default function Host() {
     <div className="min-h-screen bg-gray-900 text-white flex">
       {/* LEFT PANEL - PIN & PLAYERS */}
       <div className="w-96 bg-gradient-to-b from-purple-900 to-black p-8 flex flex-col">
-        <h1 className="text-6xl font-black text-center mb-8">QuizBoom!</h1>
+        <h1 className="text-4xl font-black text-center mb-8">QuizBoom!</h1>
 
         <div className="bg-black/60 rounded-3xl p-8 text-center mb-8">
           <p className="text-2xl opacity-80">Game PIN</p>
-          <div className="text-8xl font-bold text-cyan-400 tracking-wider">
+          <div className="text-6xl font-bold text-cyan-400 tracking-wider">
             {gamePIN}
           </div>
         </div>
@@ -139,7 +139,7 @@ export default function Host() {
 
         {gameStatus === 'playing' && currentQuestion && (
           <div className="text-center max-w-6xl">
-            <h3 className="text-5xl font-bold mb-8 text-cyan-400">
+            <h3 className="text-3xl font-bold mb-8 text-cyan-400">
               Question {questionIndex}
             </h3>
             <h2 className="text-8xl font-black mb-20 leading-tight">
@@ -160,7 +160,7 @@ export default function Host() {
 
         {gameStatus === 'leaderboard' && (
           <div className="text-center">
-            <h2 className="text-9xl font-black mb-20 text-yellow-400 drop-shadow-lg">Leaderboard</h2>
+            <h2 className="text-6xl font-black mb-20 text-yellow-400 drop-shadow-lg">Leaderboard</h2>
             {leaderboard.map((p, i) => (
               <div
                 key={i}
@@ -175,12 +175,12 @@ export default function Host() {
 
         {gameStatus === 'finished' && (
           <div className="text-center">
-            <h1 className="text-9xl font-black mb-20 text-yellow-400">Game Over!</h1>
+            <h1 className="text-6xl font-black mb-20 text-yellow-400">Game Over!</h1>
             {finalResults.slice(0, 3).map((p, i) => (
               <div key={i} className="my-16 animate-bounce">
-                <div className="text-9xl mb-6">{TROPHY[i]}</div>
-                <div className="text-8xl font-black text-cyan-400">{p.nickname}</div>
-                <div className="text-7xl text-yellow-300">{p.score} points</div>
+                <div className="text-6xl mb-6">{TROPHY[i]}</div>
+                <div className="text-4xl font-black text-cyan-400">{p.nickname}</div>
+                <div className="text-3xl text-yellow-300">{p.score} points</div>
               </div>
             ))}
           </div>
