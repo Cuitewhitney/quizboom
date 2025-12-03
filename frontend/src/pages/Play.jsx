@@ -123,13 +123,13 @@ export default function Play() {
   if (gameState === 'final') {
     return (
       <div className="min-h-screen bg-gradient-to-br from-yellow-600 via-pink-600 to-purple-800 flex flex-col items-center justify-center text-white">
-        <h1 className="text-9xl font-black mb-16 animate-bounce">Game Over!</h1>
+        <h1 className="text-6xl font-black mb-16 animate-bounce">Game Over!</h1>
         <div className="space-y-12">
           {finalResults.slice(0, 3).map((p, i) => (
             <div key={i} className="text-center">
-              <div className="text-9xl mb-4">{['1st Place', '2nd Place', '3rd Place'][i]}</div>
-              <div className="text-8xl font-black text-cyan-400">{p.nickname}</div>
-              <div className="text-7xl text-yellow-300">{p.score} points</div>
+              <div className="text-6xl mb-4">{['1st Place', '2nd Place', '3rd Place'][i]}</div>
+              <div className="text-4xl font-black text-cyan-400">{p.nickname}</div>
+              <div className="text-3xl text-yellow-300">{p.score} points</div>
             </div>
           ))}
         </div>
