@@ -56,11 +56,11 @@ export default function Play() {
   if (gameState === 'waiting') {
     return (
       <div className="min-h-screen bg-gradient-to-br from-purple-900 to-pink-900 flex flex-col items-center justify-center text-white">
-        <h1 className="text-7xl font-black mb-8 animate-bounce">Ready, {nick}!</h1>
+        <h1 className="text-5xl font-black mb-8 animate-bounce">Ready, {nick}!</h1>
         <p className="text-4xl">Get ready...</p>
         <div className="mt-20 flex gap-8">
           {COLORS.map((color, i) => (
-            <div key={i} className={`w-32 h-32 ${color} rounded-3xl animate-pulse`} style={{ animationDelay: `${i * 200}ms` }} />
+            <div key={i} className={`w-22 h-22 ${color} rounded-3xl animate-pulse`} style={{ animationDelay: `${i * 200}ms` }} />
           ))}
         </div>
       </div>
